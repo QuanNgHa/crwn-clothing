@@ -9,7 +9,7 @@
   margin: 0 7.5px 15px;
 
   &:hover {
-    cursor: pointer;
+    cursor: pointer; /*When we are hover, the cursor will become a hand pointer*/
   
     & .background-image {
       transform: scale(1.1); /*scale 1.1 with current image*/
