@@ -8,7 +8,7 @@ firebase.initializeApp(config);
 
 export const createUserProfileDocument = async (userAuth, additionalData) => {
     if (!userAuth) return; //if userAuth = null => exit this function
-
+    //userRef `users/${userAuth.uid}`, uid in auth is also the userId in users collection
     const userRef = firestore.doc(`users/${userAuth.uid}`);
     const snapShot = await userRef.get()
 
@@ -29,6 +29,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     }
     //we still needs userRef for something
     return userRef;
+
 
 }
 
