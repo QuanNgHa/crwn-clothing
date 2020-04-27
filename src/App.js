@@ -21,23 +21,25 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    // async user since this is an API request => Async function
+    //onAuthStateChanged to check in Firebase if Auth changed, if changed => return userAuth info
+    //async userAuth since this is an API request => Async function
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       //if user log-in => userAuth is not Null
       if (userAuth) {
+        //Create new userAuth infor if not exists
         const userRef = await createUserProfileDocument(userAuth);
-
+        //Update the currentUser State of App
         userRef.onSnapshot(snapShot => {
           this.setState({
             currentUser: {
               id: snapShot.id,
               ...snapShot.data() //snapShote.data() returns everything in Snapshot, except id
             }
-          }, () => { console.log(this.state); })
+          })
         });
 
       }
-      //if user log-out => (userAuth == null) => set currentUser to null
+      //(userAuth == null) means user logged out => set currentUser State to null
       this.setState({ currentUser: userAuth });
     });
   }
