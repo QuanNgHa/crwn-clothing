@@ -1,5 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import './App.css';
 import HomePage from './pages/homepage/homepage.component';
@@ -8,19 +9,15 @@ import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up
 
 import Header from './components/header/header.component';
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
+import { setCurrentUser } from './redux/user/user.actions';
 
 
 class App extends React.Component {
-  constructor() {
-    super();
 
-    this.state = {
-      currentUser: null
-    }
-  }
   unsubscribeFromAuth = null;
 
   componentDidMount() {
+    const { setCurrentUser } = this.props;
     //onAuthStateChanged to check in Firebase if Auth changed, if changed => return userAuth info
     //async userAuth since this is an API request => Async function
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
@@ -30,17 +27,15 @@ class App extends React.Component {
         const userRef = await createUserProfileDocument(userAuth);
         //Update the currentUser State of App
         userRef.onSnapshot(snapShot => {
-          this.setState({
-            currentUser: {
-              id: snapShot.id,
-              ...snapShot.data() //snapShote.data() returns everything in Snapshot, except id
-            }
+          setCurrentUser({
+            id: snapShot.id,
+            ...snapShot.data() //snapShote.data() returns everything in Snapshot, except id
           })
         });
 
       }
       //(userAuth == null) means user logged out => set currentUser State to null
-      this.setState({ currentUser: userAuth });
+      setCurrentUser(userAuth);
     });
   }
 
@@ -51,7 +46,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/shop' component={ShopPage} />
@@ -61,6 +56,10 @@ class App extends React.Component {
     );
   }
 }
+//Dispatch is a way for Redux to know whenever an object you pass to me will be an action object I pass to reducer
+const mapDispatchToProps = dispatch => ({
+  setCurrentUser: user => dispatch(setCurrentUser(user))
+})
 
-export default App;
+export default connect(null, mapDispatchToProps)(App);
 
